@@ -1,0 +1,70 @@
+create database BI;
+use BI;
+
+Create table customers (
+CustomerID int primary Key,
+FirstName varchar(255),
+LastName varchar(255),
+CustomerEmail varchar(255),
+CustomerPhone varchar(255),
+CustomerAdress varchar(255),
+CustomerCity varchar(255),
+CustomerState varchar(255),
+CustomerZip int
+);
+
+Create table Orders (
+OrderID int primary Key,
+orderdate date,
+CustomerID int,
+ProdNumber Varchar (255) ,
+Quantity int,
+FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+FOREIGN KEY (ProdNumber) REFERENCES Products(ProdNumber)
+);
+
+Create table products (
+ProdNumber Varchar (255) primary key,
+ProdName Varchar (255),
+Category Int,
+Price double,
+FOREIGN KEY (Category) REFERENCES ProductCategory(CategoryID)
+);
+
+
+Create table ProductCategory (
+CategoryID int primary key,
+CategoryName Varchar (255),
+CategoryAbbreviation Varchar (255)
+);
+
+
+SELECT 
+    'orderdate' AS order_date,
+    'categoryName' AS Category_name,
+    'prodName' AS Product_name,
+    'price' AS Product_Price,
+    'quantity' AS Order_qty,
+    'total_sales' AS total_sales,
+    'customerEmail' AS Cust_email,
+    'customerCity' AS Cust_city
+
+UNION ALL
+
+SELECT 
+    o.orderdate,
+    pc.categoryName,
+    p.prodName,
+    p.price,
+    o.quantity,
+    (p.price*o.quantity) AS total_sales,
+    c.customerEmail,
+    c.customerCity
+FROM customers c
+JOIN orders o ON c.customerID=o.customerID
+LEFT JOIN products p ON p.ProdNumber=o.ProdNumber
+LEFT JOIN ProductCategory pc ON p.category=pc.categoryID
+INTO OUTFILE 'E:\Rakamin Bi\dataset\csv\ini.csv'
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
